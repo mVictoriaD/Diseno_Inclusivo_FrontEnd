@@ -1,0 +1,72 @@
+<h2>Registrar Película (Reactive Form)</h2>
+
+<form [formGroup]="peliculaForm" (ngSubmit)="onSubmit()">
+
+   <!-- Título -->
+   <div>
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" formControlName="titulo">
+    @if (peliculaForm.get('titulo')?.invalid && (peliculaForm.get('titulo')?.dirty || peliculaForm.get('titulo')?.touched)) {
+      <div class="alert alert-danger">
+      Título es requerido.
+      </div>
+    }
+  </div>
+
+  <!-- Subtitulada -->
+  <div>
+    <label for="subtitulada">Subtitulada:</label>
+    <input type="checkbox" id="subtitulada" formControlName="subtitulada">
+  </div>
+
+  <!-- Estreno -->
+  <div>
+    <label for="estreno">Estreno:</label>
+    <input type="checkbox" id="estreno" formControlName="estreno">
+  </div>
+  <!-- Género -->
+  <div>
+    <label for="genero">Género:</label>
+    <select id="genero" formControlName="genero">
+      <option [ngValue]="null" disabled>Seleccione un género</option>
+      @for (genero of generos; track genero.id) {
+        <option [ngValue]="genero.id">{{ genero.nombre }}</option>
+      }
+    </select>
+    @if (peliculaForm.get('genero')?.invalid && (peliculaForm.get('genero')?.dirty || peliculaForm.get('genero')?.touched)) {
+      <div class="alert alert-danger">
+        Género es requerido.
+      </div>
+    }
+  </div>
+  <!-- Actores Disponibles -->
+  <div>
+    <h3>Actores</h3>
+    <div>
+      <label for="actorSelect">Seleccionar Actor:</label>
+      <select id="actorSelect"  #actorSelect (change)="onActorSelectionChange($event)">
+         <option [ngValue]="null" disabled selected>Seleccione un actor para agregar</option>
+        @for (actor of actoresDisponibles; track actor.id) {
+          <option [value]="actor.id">{{ actor.nombre }}  {{ actor.apellidos }}</option>
+        }
+      </select>
+      <button type="button" (click)="addActor()" [disabled]="actorSelect.value==='Seleccione un actor para agregar'">Agregar Actor</button>
+    </div>
+   
+    <h4>Actores Seleccionados:</h4>
+    <ul>
+      @for (actor of actoresPelicula; track actor.id) {
+        <li>
+          {{ actor.nombre }}    {{ actor.apellidos }}
+          <button type="button" (click)="removeActor(actor.id)">Quitar</button>
+        </li>
+      } @empty {
+        <li>No hay actores seleccionados.</li>
+      }
+    </ul>
+    </div>
+  <!-- Submit Button -->
+  <button type="submit" [disabled]="peliculaForm.invalid">Guardar Película</button>
+
+
+</form>
