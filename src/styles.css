@@ -1,1 +1,153 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --fondo: #f5f2fb;
+  --superficie: #ffffff;
+  --texto: #1f1b2e;
+  --borde: #cfc7e0;
+  --acento: #6b21a8;
+  --acento-oscuro: #4c1d95;
+  --error: #a3122f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+h2 {
+  margin: 20px 0 12px;
+  font-size: 1.25rem;
+}
+
+h3 {
+  margin: 16px 0 8px;
+  font-size: 1rem;
+}
+
+.barra {
+  background: var(--acento-oscuro);
+}
+
+.barra nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.marca {
+  margin-right: auto;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.barra a {
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.barra a:hover,
+.barra a.activo {
+  background: #ffffff;
+  color: var(--acento-oscuro);
+}
+
+.pagina {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.tarjeta {
+  padding: 24px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+.campo {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.campo label,
+.campo > span {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  border: 1px solid #6f6685;
+  border-radius: 8px;
+}
+
+button {
+  padding: 10px 16px;
+  background: var(--acento);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--acento);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--acento-oscuro);
+}
+
+button.secundario {
+  background: var(--superficie);
+  color: var(--acento);
+}
+
+button.secundario:hover:not(:disabled) {
+  background: var(--fondo);
+  color: var(--acento-oscuro);
+}
+
+button:disabled {
+  background: #ddd8e8;
+  color: #4a4359;
+  border-color: #ddd8e8;
+  cursor: not-allowed;
+}
+
+.alert {
+  margin-top: 4px;
+  color: var(--error);
+  font-weight: 600;
+}
+
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.barra a:focus-visible {
+  outline-color: #ffffff;
+}

@@ -3,6 +3,7 @@ import { PeliculaSearchComponent } from './peliculas/pelicula-search.component/p
 import { PeliculaInsertReactiveComponent } from './peliculas/pelicula-insert-reactive.component/pelicula-insert-reactive.component';
 
 export const routes: Routes = [
-    { path: 'pelicula-search', component:  PeliculaSearchComponent},
-    { path: 'pelicula-insert', component:  PeliculaInsertReactiveComponent},
+  { path: '', redirectTo: 'pelicula-search', pathMatch: 'full' },
+  { path: 'pelicula-search', component: PeliculaSearchComponent, title: 'Búsqueda de películas' },
+  { path: 'pelicula-insert', component: PeliculaInsertReactiveComponent, title: 'Registrar película' },
 ];

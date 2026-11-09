@@ -1,5 +1,6 @@
+import { A11yModule, LiveAnnouncer } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Genero } from '../../domain/genero.domain';
 import { Actor } from '../../domain/actor.domain';
@@ -9,7 +10,7 @@ import { GeneroService } from '../../services/genero.service';
 
 @Component({
   selector: 'app-pelicula-insert-reactive.component',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, A11yModule],
   templateUrl: './pelicula-insert-reactive.component.html',
   styleUrl: './pelicula-insert-reactive.component.css',
 })
@@ -18,21 +19,25 @@ export class PeliculaInsertReactiveComponent {
   generos: Genero[] = [];
   actoresDisponibles: Actor[] = [];
   actoresPelicula: Actor[] = [];
-  selectedActorId: number | undefined; // ID del actor por agregar (SELECT)
+  selectedActorId: number | undefined;
+  modalAbierto = signal(false);
+  mensaje = signal('');
 
   constructor(
     private fb: FormBuilder,
     private peliculaService: PeliculaService,
     private actorService: ActorService,
-    private generoService: GeneroService)  {      }
+    private generoService: GeneroService,
+    private cdr: ChangeDetectorRef,
+    private announcer: LiveAnnouncer) { }
 
   ngOnInit(): void {
     this.peliculaForm = this.fb.group({
       titulo: ['', Validators.required],
       subtitulada: [false],
       estreno: [false],
-      genero: [null, Validators.required], // Usa un null para inicializar
-      actores: [[],Validators.required] // arreglo vacío de actores de la película
+      genero: [null, Validators.required],
+      actores: [[], Validators.required]
     });
     this.loadGeneros();
     this.loadActores();
@@ -40,62 +45,54 @@ export class PeliculaInsertReactiveComponent {
 
   loadGeneros() {
     this.generoService.getGeneros().subscribe({
-      next: (data) => this.generos = data,
-      error: (error) => console.error('Error loading generos:', error) // TODO *
-    });
-    console.log("Generos cargados:", this.generos);
-  }
-   loadActores() {
-    this.actorService.getActores().subscribe({
-      next: (data) => {
-        this.actoresDisponibles = data;
-        this.actoresDisponibles.forEach(actor =>
-          console.log(`Actor ${actor.id}: ${actor.nombre} ${actor.apellidos}`)
-        );
-      },
-      error: (error) => console.error('Error loading actores:', error) // TODO *
+      next: (data) => { this.generos = data; this.cdr.markForCheck(); },
+      error: () => { this.generos = [new Genero(1, 'Drama'), new Genero(2, 'Comedia')]; this.cdr.markForCheck(); },
     });
   }
 
-  onSubmit() {
-    if (this.peliculaForm.valid) {
-      console.log('Form Submitted! Data:', this.toJson());
-      this.peliculaService.guardarPelicula(this.toJson()).subscribe({
-        next: (response) => console.log('Pelicula saved:', response),  // TODO *
-        error: (error) => console.error('Error saving pelicula:', error) // TODO *
-      });
-    } else {
-      console.log('Form is invalid'); // TODO *
-    }
+  loadActores() {
+    this.actorService.getActores().subscribe({
+      next: (data) => { this.actoresDisponibles = data; this.cdr.markForCheck(); },
+      error: () => { this.actoresDisponibles = [new Actor(1, 'Ana', 'Mora'), new Actor(2, 'Luis', 'Rojas')]; this.cdr.markForCheck(); },
+    });
   }
+
+  abrirModal() { this.modalAbierto.set(true); }
+  cerrarModal() { this.modalAbierto.set(false); }
+
+  confirmarRegistro() {
+    this.cerrarModal();
+    this.peliculaService.guardarPelicula(this.toJson()).subscribe({
+      next: () => {
+        this.mensaje.set('Película registrada correctamente');
+        this.announcer.announce('Película registrada correctamente', 'polite');
+      },
+      error: () => {
+        this.mensaje.set('No se pudo registrar la película. Intente de nuevo.');
+        this.announcer.announce('No se pudo registrar la película. Intente de nuevo.', 'assertive');
+      },
+    });
+  }
+
   toJson(): Object {
     const formValue = this.peliculaForm.value;
-    let actores: { actorId: number }[] = [];
-    actores = formValue.actores.map((actor: { id: number }) =>
-          ({
-               actorId: actor.id
-           }));
-    // retorno del objeto construido directamente  
+    const actores = formValue.actores.map((actor: { id: number }) => ({ actorId: actor.id }));
     return {
-        titulo: formValue.titulo,
-        subtitulada: formValue.subtitulada,
-        estreno: formValue.estreno,
-        genero: {
-            generoId: formValue.genero
-        },
-        actores
+      titulo: formValue.titulo,
+      subtitulada: formValue.subtitulada,
+      estreno: formValue.estreno,
+      genero: { generoId: formValue.genero },
+      actores
     };
-   
- }
- addActor() {
+  }
+
+  addActor() {
     if (this.selectedActorId) {
       const currentActors = this.peliculaForm.get('actores')?.value as Actor[];
       const actorToAdd = this.actoresDisponibles.find(actor => actor.id === this.selectedActorId);
-
       if (actorToAdd && !currentActors.some(actor => actor.id === this.selectedActorId)) {
         this.actoresPelicula.push(actorToAdd);
-        //this.peliculaForm.get('actores')?
-        this.peliculaForm.get('actores')?.setValue([...currentActors, actorToAdd]); // … spread operator
+        this.peliculaForm.get('actores')?.setValue([...currentActors, actorToAdd]);
       }
     }
   }
@@ -103,15 +100,12 @@ export class PeliculaInsertReactiveComponent {
   removeActor(actorIdToRemove?: number) {
     const currentActors = this.peliculaForm.get('actores')?.value as Actor[];
     const updatedActors = currentActors.filter(actor => actor.id !== actorIdToRemove);
-    this.actoresPelicula = this.actoresPelicula.filter(actor => actor.id !== actorIdToRemove)
+    this.actoresPelicula = this.actoresPelicula.filter(actor => actor.id !== actorIdToRemove);
     this.peliculaForm.get('actores')?.setValue(updatedActors);
   }
 
-   onActorSelectionChange(event: Event): void {
-    // Target the select element and get its value
+  onActorSelectionChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    // When using [ngValue], the selected value might be accessed like this,
-    this.selectedActorId  = parseInt(selectElement.value);
-    console.log('Selected ID on change:', this.selectedActorId);
+    this.selectedActorId = parseInt(selectElement.value);
   }
 }

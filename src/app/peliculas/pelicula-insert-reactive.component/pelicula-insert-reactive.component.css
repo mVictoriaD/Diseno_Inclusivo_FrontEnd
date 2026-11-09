@@ -1,0 +1,71 @@
+.opciones {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.campo-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fila {
+  display: flex;
+  gap: 8px;
+}
+
+.fila select {
+  flex: 1;
+}
+
+.lista-actores {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.lista-actores li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.aviso {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--superficie);
+  border: 1px solid var(--acento);
+  border-left-width: 6px;
+  border-radius: 8px;
+}
+
+.fondo-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(20, 12, 40, 0.65);
+}
+
+.modal {
+  width: min(440px, 100%);
+  padding: 24px;
+  background: var(--superficie);
+  border-radius: 12px;
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
