@@ -1,0 +1,87 @@
+.search-page {
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.hero {
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-weight: bold;
+  color: #cccccc;
+}
+
+/* P03: Contraste insuficiente */
+p {
+  color: #aaaaaa;
+}
+
+.search-form {
+  margin-bottom: 20px;
+}
+
+.search-form label {
+  display: block;
+  margin-top: 12px;
+  color: #cccccc;
+}
+
+.search-form input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #dddddd;
+  box-sizing: border-box;
+}
+
+/* P01: DIV con apariencia de botón */
+.button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 15px;
+  background-color: #eeeeee;
+  color: #cccccc;
+  cursor: pointer;
+}
+
+.button.secondary {
+  background-color: #ffffff;
+}
+
+/* P04: Eliminación del foco visible */
+input:focus,
+.button:focus {
+  outline: none;
+}
+
+.message {
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.message.error {
+  color: #ffaaaa;
+}
+
+.table-shell {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #be9e9e;
+  text-align: left;
+}
+
+th {
+  background-color: #eeeeee;
+  color: #cccccc;
+}

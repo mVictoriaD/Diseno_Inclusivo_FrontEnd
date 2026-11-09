@@ -1,0 +1,126 @@
+<div class="search-page">
+
+  <div class="hero">
+
+    <p class="eyebrow">CATÁLOGO DE PELÍCULAS</p>
+
+    <h2>Búsqueda de películas</h2>
+
+    <p>Encuentra tu película favorita.</p>
+
+    <!-- P05: Imagen sin atributo ALT -->
+    <img
+      src="/poster-ejemplo.jpg"
+      width="120"
+    >
+
+  </div>
+
+  <div class="search-form-container">
+
+    <form
+      [formGroup]="searchForm"
+      (ngSubmit)="buscar()"
+      class="search-form"
+    >
+
+      <!-- P02: Label huérfano -->
+      <label for="titulo">
+        Título de película
+      </label>
+
+      <input
+        type="text"
+        formControlName="titulo"
+        placeholder="Ej. Spider-Man"
+      >
+
+      <label>
+        Género
+      </label>
+
+      <input
+        type="text"
+        formControlName="genero"
+        placeholder="Ej. Acción"
+      >
+
+      <!-- P01: DIV utilizado como botón -->
+      <div
+        class="button"
+        (click)="buscar()"
+      >
+        Buscar películas
+      </div>
+
+      <div
+        class="button secondary"
+        (click)="limpiar()"
+      >
+        Limpiar búsqueda
+      </div>
+
+    </form>
+
+  </div>
+
+  @if (error()) {
+    <p class="message error">
+      {{ error() }}
+    </p>
+  }
+
+  @if (loading()) {
+    <p class="message">
+      Cargando películas...
+    </p>
+  }
+
+  @else if (searched()) {
+
+    @if (resultados().length > 0) {
+
+      <div class="table-shell">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Género</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (
+              pelicula of resultados();
+              track trackByPeliculaId($index, pelicula)
+            ) {
+
+              <tr>
+                <td>{{ pelicula.titulo }}</td>
+                <td>{{ pelicula.genero.nombre }}</td>
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+    @else {
+
+      <p class="message">
+        No se encontraron películas.
+      </p>
+
+    }
+
+  }
+
+</div>
