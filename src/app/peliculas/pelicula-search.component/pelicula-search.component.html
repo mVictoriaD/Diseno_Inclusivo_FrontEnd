@@ -41,6 +41,7 @@
             <tr>
               <th scope="col">Título de la película</th>
               <th scope="col">Género</th>
+              <th scope="col">Acción</th>
             </tr>
           </thead>
           <tbody>
@@ -48,9 +49,12 @@
               <tr>
                 <td>{{ pelicula.titulo }}</td>
                 <td>{{ pelicula.genero.nombre || 'Sin género' }}</td>
+                <button type="button" (click)="eliminarPelicula(pelicula)">
+                    Eliminar
+                  </button>
               </tr>
             }
-          </tbody>
+          </tbody> 
         </table>
       </div>
     } @else {
