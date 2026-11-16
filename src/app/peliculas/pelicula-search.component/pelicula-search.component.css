@@ -1,26 +1,32 @@
 .hero {
   margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-borde);
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--primario-claro);
 }
 
 .hero h2 {
   margin: 0 0 4px;
   font-size: 1.75rem;
+  color: var(--primario-oscuro);
 }
 
 .hero p {
   margin: 0;
-  color: var(--color-texto-suave);
+  color: var(--texto-suave);
 }
 
-.eyebrow {
-  margin: 0 0 6px;
-  font-size: 0.8rem;
+/* Etiqueta pequeña tipo píldora sobre el título */
+.hero .eyebrow {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-primario) !important;
+  color: #8a1048;
+  background: var(--acento-claro);
+  border-radius: 999px;
 }
 
 .search-form {
@@ -29,6 +35,10 @@
   gap: 16px;
   align-items: end;
   margin-bottom: 24px;
+  padding: 20px;
+  background: #faf9ff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
 }
 
 .field {
@@ -46,24 +56,24 @@
 .message {
   margin: 16px 0;
   padding: 12px 16px;
-  border-radius: 8px;
-  background: #f3f4f6;
-  color: var(--color-texto-suave);
+  border-radius: 10px;
+  background: var(--primario-claro);
+  color: var(--primario-oscuro);
 }
 
 .message.error {
-  background: #fee2e2;
-  color: var(--color-error);
+  background: #fdecea;
+  color: var(--error);
 }
 
 .table-shell {
   overflow-x: auto;
-  border: 1px solid var(--color-borde);
-  border-radius: 8px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
 }
 
 .results-table tbody tr:hover {
-  background: #f5f7ff;
+  background: var(--primario-claro);
 }
 
 @media (max-width: 640px) {
