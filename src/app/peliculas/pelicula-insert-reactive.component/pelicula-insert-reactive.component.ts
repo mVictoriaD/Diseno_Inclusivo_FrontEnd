@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { A11yModule, LiveAnnouncer } from '@angular/cdk/a11y';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Genero } from '../../domain/genero.domain';
 import { Actor } from '../../domain/actor.domain';
@@ -9,7 +10,7 @@ import { GeneroService } from '../../services/genero.service';
 
 @Component({
   selector: 'app-pelicula-insert-reactive.component',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, A11yModule],
   templateUrl: './pelicula-insert-reactive.component.html',
   styleUrl: './pelicula-insert-reactive.component.css',
 })
@@ -23,6 +24,8 @@ export class PeliculaInsertReactiveComponent {
   readonly modalAbierto = signal(false);
   readonly mensaje = signal('');
   readonly guardando = signal(false);
+  // Servicio para avisarle al lector de pantalla el resultado
+  private readonly announcer = inject(LiveAnnouncer);
 
   constructor(
     private fb: FormBuilder,
@@ -77,11 +80,13 @@ export class PeliculaInsertReactiveComponent {
       next: () => {
         this.guardando.set(false);
         this.mensaje.set('Película registrada correctamente.');
+        this.announcer.announce('Película registrada correctamente.', 'polite');
         this.limpiarFormulario();
       },
       error: () => {
         this.guardando.set(false);
         this.mensaje.set('No se pudo registrar la película. Intente de nuevo.');
+        this.announcer.announce('No se pudo registrar la película. Intente de nuevo.', 'assertive');
       }
     });
   }

@@ -1,4 +1,4 @@
-<h2>Registrar Película (Reactive Form)</h2>
+<h2 id="titulo-principal" tabindex="-1">Registrar Película (Reactive Form)</h2>
 
 <form [formGroup]="peliculaForm" (ngSubmit)="abrirModal()">
 
@@ -70,15 +70,16 @@
 
 </form>
 
-<!-- Aviso del resultado: por ahora solo se ve en pantalla -->
+<!-- Aviso del resultado: se ve en pantalla y LiveAnnouncer lo lee -->
 @if (mensaje()) {
   <p class="aviso">{{ mensaje() }}</p>
 }
 
-<!-- Modal de confirmación: por ahora el foco puede salirse con Tab -->
+<!-- Modal de confirmación: el foco queda atrapado, Escape lo cierra y al cerrar vuelve al botón Guardar -->
 @if (modalAbierto()) {
   <div class="fondo-modal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal"
+         cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (keydown.escape)="cerrarModal()">
       <h3 id="titulo-modal">Confirmar registro</h3>
       <p>¿Desea registrar esta película?</p>
       <div class="acciones">

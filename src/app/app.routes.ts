@@ -6,8 +6,8 @@ import { PeliculaSearchAccesibleComponent } from './peliculas/pelicula-search-ac
 
 export const routes: Routes = [
     { path: '', redirectTo: 'pelicula-search', pathMatch: 'full' },
-    { path: 'pelicula-search', component:  PeliculaSearchComponent},
-    { path: 'pelicula-insert', component:  PeliculaInsertReactiveComponent},
-    { path: 'pelicula-search-demo', component:  PeliculaSearchDemoComponent},
-    { path: 'pelicula-search-accesible', component:  PeliculaSearchAccesibleComponent},
+    { path: 'pelicula-search', component: PeliculaSearchComponent, title: 'Búsqueda de películas' },
+    { path: 'pelicula-insert', component: PeliculaInsertReactiveComponent, title: 'Registrar película' },
+    { path: 'pelicula-search-demo', component: PeliculaSearchDemoComponent, title: 'Búsqueda demo' },
+    { path: 'pelicula-search-accesible', component: PeliculaSearchAccesibleComponent, title: 'Búsqueda accesible' },
 ];
