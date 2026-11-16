@@ -1,0 +1,218 @@
+<main class="search-page">
+
+  <header class="hero">
+
+    <p class="eyebrow">CATÁLOGO DE PELÍCULAS</p>
+
+    <h1>Búsqueda de películas Taller G2</h1>
+
+    <p>
+      Encuentra tus películas favoritas filtrando por título o género.
+    </p>
+
+    <img
+      src="/poster-ejemplo.jpg"
+      alt="Póster de ejemplo de una película del catálogo"
+      width="120"
+    >
+
+  </header>
+
+  <section aria-labelledby="search-title">
+
+    <h2 id="search-title">
+      Filtros de búsqueda
+    </h2>
+
+    <form
+      [formGroup]="searchForm"
+      (ngSubmit)="buscar()"
+      class="search-form"
+      novalidate
+    >
+
+      <div class="field">
+
+        <label for="titulo">
+          Título de película
+        </label>
+
+        <input
+          id="titulo"
+          type="text"
+          formControlName="titulo"
+          placeholder="Ej. Spider-Man"
+          maxlength="100"
+          aria-describedby="titulo-help titulo-error"
+          [attr.aria-invalid]="
+            searchForm.controls.titulo.invalid &&
+            searchForm.controls.titulo.touched
+          "
+        >
+
+        <small id="titulo-help">
+          Escriba el nombre de la película que desea encontrar.
+        </small>
+
+        @if (
+          searchForm.controls.titulo.invalid &&
+          searchForm.controls.titulo.touched
+        ) {
+
+          <p id="titulo-error" class="field-error">
+            El título no puede superar los 100 caracteres.
+          </p>
+
+        }
+
+      </div>
+
+      <div class="field">
+
+        <label for="genero">
+          Género cinematográfico
+        </label>
+
+        <input
+          id="genero"
+          type="text"
+          formControlName="genero"
+          placeholder="Ej. Acción"
+          maxlength="50"
+          aria-describedby="genero-help genero-error"
+          [attr.aria-invalid]="
+            searchForm.controls.genero.invalid &&
+            searchForm.controls.genero.touched
+          "
+        >
+
+        <small id="genero-help">
+          Ejemplos: Acción, Drama, Comedia o Terror.
+        </small>
+
+        @if (
+          searchForm.controls.genero.invalid &&
+          searchForm.controls.genero.touched
+        ) {
+
+          <p id="genero-error" class="field-error">
+            El género no puede superar los 50 caracteres.
+          </p>
+
+        }
+
+      </div>
+
+      <div class="actions">
+
+        <button type="submit">
+          Buscar películas
+        </button>
+
+        <button
+          type="button"
+          class="secondary"
+          (click)="limpiar()"
+        >
+          Limpiar búsqueda
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+  <!-- Mensajes accesibles -->
+
+  @if (error()) {
+
+    <p class="message error" role="alert">
+      {{ error() }}
+    </p>
+
+  }
+
+  @if (loading()) {
+
+    <p class="message" role="status">
+      Cargando películas. Espere un momento.
+    </p>
+
+  }
+
+  @else if (searched()) {
+
+    <section
+      aria-labelledby="results-title"
+      aria-live="polite"
+    >
+
+      <h2 id="results-title">
+        Resultados de búsqueda
+      </h2>
+
+      @if (resultados().length > 0) {
+
+        <p>
+          Se encontraron {{ resultados().length }} películas.
+        </p>
+
+        <div class="table-shell">
+
+          <table>
+
+            <caption>
+              Películas encontradas según los filtros seleccionados.
+            </caption>
+
+            <thead>
+
+              <tr>
+                <th scope="col">Título de la película</th>
+                <th scope="col">Género</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (
+                pelicula of resultados();
+                track pelicula.peliculaId
+              ) {
+
+                <tr>
+
+                  <td>{{ pelicula.titulo }}</td>
+
+                  <td>
+                    {{ pelicula.genero.nombre || 'Sin género' }}
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+      @else {
+
+        <p class="message empty">
+          No se encontraron películas con los filtros seleccionados.
+          Intente modificar los criterios de búsqueda.
+        </p>
+
+      }
+
+    </section>
+
+  }
+
+</main>
