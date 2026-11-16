@@ -1,6 +1,6 @@
 <h2>Registrar Película (Reactive Form)</h2>
 
-<form [formGroup]="peliculaForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="peliculaForm" (ngSubmit)="abrirModal()">
 
    <!-- Título -->
    <div>
@@ -29,7 +29,7 @@
     <label for="genero">Género:</label>
     <select id="genero" formControlName="genero">
       <option [ngValue]="null" disabled>Seleccione un género</option>
-      @for (genero of generos; track genero.id) {
+      @for (genero of generos(); track genero.id) {
         <option [ngValue]="genero.id">{{ genero.nombre }}</option>
       }
     </select>
@@ -44,18 +44,18 @@
     <h3>Actores</h3>
     <div>
       <label for="actorSelect">Seleccionar Actor:</label>
-      <select id="actorSelect"  #actorSelect (change)="onActorSelectionChange($event)">
+      <select id="actorSelect" (change)="onActorSelectionChange($event)">
          <option [ngValue]="null" disabled selected>Seleccione un actor para agregar</option>
-        @for (actor of actoresDisponibles; track actor.id) {
+        @for (actor of actoresDisponibles(); track actor.id) {
           <option [value]="actor.id">{{ actor.nombre }}  {{ actor.apellidos }}</option>
         }
       </select>
-      <button type="button" (click)="addActor()" [disabled]="actorSelect.value==='Seleccione un actor para agregar'">Agregar Actor</button>
+      <button type="button" (click)="addActor()">Agregar Actor</button>
     </div>
-   
+
     <h4>Actores Seleccionados:</h4>
     <ul>
-      @for (actor of actoresPelicula; track actor.id) {
+      @for (actor of actoresPelicula(); track actor.id) {
         <li>
           {{ actor.nombre }}    {{ actor.apellidos }}
           <button type="button" (click)="removeActor(actor.id)">Quitar</button>
@@ -66,7 +66,25 @@
     </ul>
     </div>
   <!-- Submit Button -->
-  <button type="submit" [disabled]="peliculaForm.invalid">Guardar Película</button>
-
+  <button type="submit" [disabled]="guardando()">Guardar Película</button>
 
 </form>
+
+<!-- Aviso del resultado: por ahora solo se ve en pantalla -->
+@if (mensaje()) {
+  <p class="aviso">{{ mensaje() }}</p>
+}
+
+<!-- Modal de confirmación: por ahora el foco puede salirse con Tab -->
+@if (modalAbierto()) {
+  <div class="fondo-modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal">
+      <h3 id="titulo-modal">Confirmar registro</h3>
+      <p>¿Desea registrar esta película?</p>
+      <div class="acciones">
+        <button type="button" (click)="cerrarModal()">Cancelar</button>
+        <button type="button" (click)="confirmarRegistro()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+}

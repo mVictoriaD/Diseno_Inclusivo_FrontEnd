@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Genero } from '../../domain/genero.domain';
 import { Actor } from '../../domain/actor.domain';
@@ -15,16 +15,20 @@ import { GeneroService } from '../../services/genero.service';
 })
 export class PeliculaInsertReactiveComponent {
   peliculaForm!: FormGroup;
-  generos: Genero[] = [];
-  actoresDisponibles: Actor[] = [];
-  actoresPelicula: Actor[] = [];
+  // Señales: la aplicación no usa Zone.js, así que la vista solo se actualiza cuando cambia una señal
+  readonly generos = signal<Genero[]>([]);
+  readonly actoresDisponibles = signal<Actor[]>([]);
+  readonly actoresPelicula = signal<Actor[]>([]);
   selectedActorId: number | undefined; // ID del actor por agregar (SELECT)
+  readonly modalAbierto = signal(false);
+  readonly mensaje = signal('');
+  readonly guardando = signal(false);
 
   constructor(
     private fb: FormBuilder,
     private peliculaService: PeliculaService,
     private actorService: ActorService,
-    private generoService: GeneroService)  {      }
+    private generoService: GeneroService) { }
 
   ngOnInit(): void {
     this.peliculaForm = this.fb.group({
@@ -32,7 +36,7 @@ export class PeliculaInsertReactiveComponent {
       subtitulada: [false],
       estreno: [false],
       genero: [null, Validators.required], // Usa un null para inicializar
-      actores: [[],Validators.required] // arreglo vacío de actores de la película
+      actores: [[], Validators.required] // arreglo vacío de actores de la película
     });
     this.loadGeneros();
     this.loadActores();
@@ -40,61 +44,78 @@ export class PeliculaInsertReactiveComponent {
 
   loadGeneros() {
     this.generoService.getGeneros().subscribe({
-      next: (data) => this.generos = data,
-      error: (error) => console.error('Error loading generos:', error) // TODO *
-    });
-    console.log("Generos cargados:", this.generos);
-  }
-   loadActores() {
-    this.actorService.getActores().subscribe({
-      next: (data) => {
-        this.actoresDisponibles = data;
-        this.actoresDisponibles.forEach(actor =>
-          console.log(`Actor ${actor.id}: ${actor.nombre} ${actor.apellidos}`)
-        );
-      },
-      error: (error) => console.error('Error loading actores:', error) // TODO *
+      next: (data) => this.generos.set(data ?? []),
+      error: () => this.mensaje.set('No se pudieron cargar los géneros. Revise que el Backend esté corriendo.')
     });
   }
 
-  onSubmit() {
-    if (this.peliculaForm.valid) {
-      console.log('Form Submitted! Data:', this.toJson());
-      this.peliculaService.guardarPelicula(this.toJson()).subscribe({
-        next: (response) => console.log('Pelicula saved:', response),  // TODO *
-        error: (error) => console.error('Error saving pelicula:', error) // TODO *
-      });
-    } else {
-      console.log('Form is invalid'); // TODO *
-    }
+  loadActores() {
+    this.actorService.getActores().subscribe({
+      next: (data) => this.actoresDisponibles.set(data ?? []),
+      error: () => this.mensaje.set('No se pudieron cargar los actores. Revise que el Backend esté corriendo.')
+    });
   }
+
+  // Antes de guardar se pide confirmación en un modal
+  abrirModal() {
+    if (this.peliculaForm.invalid) {
+      this.peliculaForm.markAllAsTouched();
+      return;
+    }
+    this.mensaje.set('');
+    this.modalAbierto.set(true);
+  }
+
+  cerrarModal() {
+    this.modalAbierto.set(false);
+  }
+
+  confirmarRegistro() {
+    this.cerrarModal();
+    this.guardando.set(true);
+    this.peliculaService.guardarPelicula(this.toJson()).subscribe({
+      next: () => {
+        this.guardando.set(false);
+        this.mensaje.set('Película registrada correctamente.');
+        this.limpiarFormulario();
+      },
+      error: () => {
+        this.guardando.set(false);
+        this.mensaje.set('No se pudo registrar la película. Intente de nuevo.');
+      }
+    });
+  }
+
+  limpiarFormulario() {
+    this.peliculaForm.reset({ titulo: '', subtitulada: false, estreno: false, genero: null, actores: [] });
+    this.actoresPelicula.set([]);
+  }
+
   toJson(): Object {
     const formValue = this.peliculaForm.value;
-    let actores: { actorId: number }[] = [];
-    actores = formValue.actores.map((actor: { id: number }) =>
-          ({
-               actorId: actor.id
-           }));
-    // retorno del objeto construido directamente  
+    const actores: { actorId: number }[] = formValue.actores.map((actor: { id: number }) =>
+      ({
+        actorId: actor.id
+      }));
+    // retorno del objeto construido directamente
     return {
-        titulo: formValue.titulo,
-        subtitulada: formValue.subtitulada,
-        estreno: formValue.estreno,
-        genero: {
-            generoId: formValue.genero
-        },
-        actores
+      titulo: formValue.titulo,
+      subtitulada: formValue.subtitulada,
+      estreno: formValue.estreno,
+      genero: {
+        generoId: formValue.genero
+      },
+      actores
     };
-   
- }
- addActor() {
+  }
+
+  addActor() {
     if (this.selectedActorId) {
       const currentActors = this.peliculaForm.get('actores')?.value as Actor[];
-      const actorToAdd = this.actoresDisponibles.find(actor => actor.id === this.selectedActorId);
+      const actorToAdd = this.actoresDisponibles().find(actor => actor.id === this.selectedActorId);
 
       if (actorToAdd && !currentActors.some(actor => actor.id === this.selectedActorId)) {
-        this.actoresPelicula.push(actorToAdd);
-        //this.peliculaForm.get('actores')?
+        this.actoresPelicula.update(lista => [...lista, actorToAdd]);
         this.peliculaForm.get('actores')?.setValue([...currentActors, actorToAdd]); // … spread operator
       }
     }
@@ -103,15 +124,12 @@ export class PeliculaInsertReactiveComponent {
   removeActor(actorIdToRemove?: number) {
     const currentActors = this.peliculaForm.get('actores')?.value as Actor[];
     const updatedActors = currentActors.filter(actor => actor.id !== actorIdToRemove);
-    this.actoresPelicula = this.actoresPelicula.filter(actor => actor.id !== actorIdToRemove)
+    this.actoresPelicula.update(lista => lista.filter(actor => actor.id !== actorIdToRemove));
     this.peliculaForm.get('actores')?.setValue(updatedActors);
   }
 
-   onActorSelectionChange(event: Event): void {
-    // Target the select element and get its value
+  onActorSelectionChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
-    // When using [ngValue], the selected value might be accessed like this,
-    this.selectedActorId  = parseInt(selectElement.value);
-    console.log('Selected ID on change:', this.selectedActorId);
+    this.selectedActorId = parseInt(selectElement.value);
   }
 }
